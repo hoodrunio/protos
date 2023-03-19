@@ -13,6 +13,9 @@ buf export Gravity-Bridge/module/proto --output ../
 git clone https://github.com/ingenuity-build/quicksilver
 buf export quicksilver/proto --output ../
 
+git clone https://github.com/KYVENetwork/chain
+buf export chain/proto --output ../
+
 cd ..
 rm -rf temp
 
