@@ -20,7 +20,7 @@ jobs:
         
       - name: Commit
         run: |
-          git checkout scheduled
+          git checkout -b scheduled
           git commit -m "Scheduled Update"
 
       - name: Create pull request
