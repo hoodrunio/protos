@@ -1,5 +1,6 @@
 buf export buf.build/evmos/evmos --output .
 buf export buf.build/osmosis-labs/osmosis --output .
+buf export buf.build/kyve//chain --output .
 
 mkdir temp
 cd temp
