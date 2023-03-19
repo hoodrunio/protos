@@ -23,7 +23,8 @@ jobs:
           git config --global user.email "automated@example.com"
           git config --global user.name "Automated"
           git checkout -b scheduled
-          git commit -am "Scheduled Update"
+          git add .
+          git commit -m "Scheduled Update"
 
       - name: Create pull request
         run: gc pr create -B scheduled -H master --title "Scheduled Update"
