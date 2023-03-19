@@ -31,3 +31,6 @@ jobs:
         run: gh pr create -B master -H scheduled --title "Scheduled Update" --body "Update protos"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Delete branch
+        run: git push -d origin scheduled
