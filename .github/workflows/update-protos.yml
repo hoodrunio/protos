@@ -25,6 +25,7 @@ jobs:
           git checkout -b scheduled
           git add .
           git commit -m "Scheduled Update"
+          git push origin scheduled
 
       - name: Create pull request
         run: gh pr create -B scheduled -H master --title "Scheduled Update" --body "Update protos"
