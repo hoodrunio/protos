@@ -22,7 +22,7 @@ jobs:
         run: |
           git config --global user.email "automated@example.com"
           git config --global user.name "Automated"
-          git checkout scheduled
+          git checkout -b scheduled
           git commit -m "Scheduled Update"
 
       - name: Create pull request
