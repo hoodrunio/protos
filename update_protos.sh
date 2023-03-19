@@ -9,6 +9,9 @@ buf export umee/proto --output ../
 git clone https://github.com/Gravity-Bridge/Gravity-Bridge
 buf export Gravity-Bridge/module/proto --output ../
 
+git clone https://github.com/ingenuity-build/quicksilver
+buf export quicksilver/proto --output ../
+
 cd ..
 rm -rf temp
 
