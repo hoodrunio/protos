@@ -32,5 +32,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-      - name: Delete branch
-        run: git push -d origin scheduled
