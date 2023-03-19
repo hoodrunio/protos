@@ -28,6 +28,6 @@ jobs:
           git push origin scheduled
 
       - name: Create pull request
-        run: gh pr create -B scheduled -H master --title "Scheduled Update" --body "Update protos"
+        run: gh pr create -B master -H scheduled --title "Scheduled Update" --body "Update protos"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
