@@ -27,6 +27,6 @@ jobs:
           git commit -m "Scheduled Update"
 
       - name: Create pull request
-        run: gc pr create -B scheduled -H master --title "Scheduled Update"
+        run: gh pr create -B scheduled -H master --title "Scheduled Update"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
