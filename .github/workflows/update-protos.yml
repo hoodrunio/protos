@@ -1,0 +1,29 @@
+name: Update protos
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1'
+  
+jobs:
+  update-protos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-actions@v1.15.0
+      
+      - name: Update
+        run: |
+          ./update_protos.sh
+        
+      - name: Commit
+        run: |
+          git checkout scheduled
+          git commit -m "Scheduled Update"
+
+      - name: Create pull request
+        run: gc pr create -B scheduled -H master --title "Scheduled Update"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
