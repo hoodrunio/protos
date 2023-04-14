@@ -13,6 +13,8 @@ jobs:
       
       - name: Setup Buf
         uses: bufbuild/buf-setup-action@v1.15.0
+        with:
+          github_token: ${{ github.token }}
       
       - name: Update
         run: |
