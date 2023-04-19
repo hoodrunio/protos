@@ -18,6 +18,10 @@ buf export quicksilver/proto --output ../
 git clone https://github.com/KYVENetwork/chain
 buf export chain/proto --output ../
 
+git clone https://github.com/lavanet/lava
+mkdir ../lava
+cp -r lava/proto/* ../lava
+
 cd ..
 rm -rf temp
 
