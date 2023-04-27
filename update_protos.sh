@@ -23,7 +23,7 @@ mkdir -p ../lavanet/lava
 cp -r lava/proto/* ../lavanet/lava
 
 git clone https://github.com/axelarnetwork/axelar-core
-cp -r axelar-core/protos ../
+cp -r axelar-core/proto/* ../
 
 cd ..
 rm -rf temp
