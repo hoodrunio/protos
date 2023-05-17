@@ -25,6 +25,9 @@ cp -r lava/proto/* ../lavanet/lava
 git clone https://github.com/axelarnetwork/axelar-core
 cp -r axelar-core/proto/* ../
 
+git clone https://github.com/chain4energy/c4e-chain
+cp -r c4e-chain/proto/* ../
+
 cd ..
 rm -rf temp
 
