@@ -28,6 +28,9 @@ cp -r axelar-core/proto/* ../
 git clone https://github.com/chain4energy/c4e-chain
 cp -r c4e-chain/proto/* ../
 
+git clone https://github.com/Agoric/agoric-sdk
+cp -r agoric-sdk/golang/cosmos/proto/* ../
+
 cd ..
 rm -rf temp
 
