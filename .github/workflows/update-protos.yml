@@ -19,18 +19,33 @@ jobs:
       - name: Update
         run: |
           ./update_protos.sh
-        
-      - name: Commit
+
+      - name: Setup Git
         run: |
           git config --global user.email "automated@example.com"
           git config --global user.name "Automated"
+      
+      - name: Check if Scheduled Branch Exists
+        id: check_branch
+        run: |
+          if git ls-remote --heads origin scheduled; then
+            echo "::set-output name=exists::true"
+          else
+            echo "::set-output name=exists::false"
+          fi
+      
+      - name: Delete the Old Scheduled Branch (If Exists)
+        if: steps.check_branch.outputs.exists == 'true'
+        run: git push origin --delete scheduled
+      
+      - name: Create New Scheduled Branch
+        run: |
           git checkout -b scheduled
           git add .
-          git commit -m "Scheduled Update"
-          git push origin scheduled
+          git commit -m "Scheduled Update" || echo "No changes to commit"
+          git push -f origin scheduled
 
       - name: Create pull request
         run: gh pr create -B master -H scheduled --title "Scheduled Update" --body "Update protos"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
