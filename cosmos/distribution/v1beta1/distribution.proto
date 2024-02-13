@@ -1,7 +1,7 @@
 syntax = "proto3";
 package cosmos.distribution.v1beta1;
 
-option go_package            = "github.com/cosmos/cosmos-sdk/x/distribution/types";
+option go_package            = "cosmossdk.io/x/distribution/types";
 option (gogoproto.equal_all) = true;
 
 import "gogoproto/gogo.proto";
@@ -15,7 +15,7 @@ message Params {
 
   string community_tax = 1 [
     (cosmos_proto.scalar)  = "cosmos.Dec",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (amino.dont_omitempty) = true,
     (gogoproto.nullable)   = false
   ];
@@ -24,7 +24,7 @@ message Params {
   // in the x/distribution module's reward mechanism.
   string base_proposer_reward = 2 [
     (cosmos_proto.scalar)  = "cosmos.Dec",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false,
     (amino.dont_omitempty) = true,
     deprecated             = true
@@ -34,7 +34,7 @@ message Params {
   // in the x/distribution module's reward mechanism.
   string bonus_proposer_reward = 3 [
     (cosmos_proto.scalar)  = "cosmos.Dec",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false,
     (amino.dont_omitempty) = true,
     deprecated             = true
@@ -104,7 +104,7 @@ message ValidatorSlashEvent {
   uint64 validator_period = 1;
   string fraction         = 2 [
     (cosmos_proto.scalar)  = "cosmos.Dec",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false
   ];
 }
@@ -115,12 +115,17 @@ message ValidatorSlashEvents {
 }
 
 // FeePool is the global fee pool for distribution.
+// It holds decimal coins. Once whole those coins can be burned or distributed to the community pool.
 message FeePool {
   repeated cosmos.base.v1beta1.DecCoin community_pool = 1 [
     (gogoproto.nullable)     = false,
     (amino.dont_omitempty)   = true,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins",
+    deprecated               = true
   ];
+
+  repeated cosmos.base.v1beta1.DecCoin decimal_pool = 2
+      [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"];
 }
 
 // CommunityPoolSpendProposal details a proposal for use of community funds,
@@ -158,7 +163,7 @@ message DelegatorStartingInfo {
   uint64 previous_period = 1;
   string stake           = 2 [
     (cosmos_proto.scalar)  = "cosmos.Dec",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable)   = false,
     (amino.dont_omitempty) = true
   ];
@@ -182,7 +187,10 @@ message DelegationDelegatorReward {
 
 // CommunityPoolSpendProposalWithDeposit defines a CommunityPoolSpendProposal
 // with a deposit
+//
+// Deprecated: Do not use.
 message CommunityPoolSpendProposalWithDeposit {
+  option deprecated                          = true;
   option (gogoproto.goproto_getters)         = false;
   option (cosmos_proto.implements_interface) = "cosmos.gov.v1beta1.Content";
 

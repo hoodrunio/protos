@@ -146,9 +146,11 @@ message RetryIBCTransferRequest {
   option (permission.exported.v1beta1.permission_role) = ROLE_UNRESTRICTED;
   bytes sender = 1 [ (gogoproto.casttype) =
                          "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
-  string chain = 2
-      [ (gogoproto.casttype) =
-            "github.com/axelarnetwork/axelar-core/x/nexus/exported.ChainName" ];
+  string chain = 2 [
+    (gogoproto.casttype) =
+        "github.com/axelarnetwork/axelar-core/x/nexus/exported.ChainName",
+    deprecated = true
+  ];
   uint64 id = 3 [
     (gogoproto.customname) = "ID",
     (gogoproto.casttype) =
@@ -164,6 +166,8 @@ message RouteMessageRequest {
                          "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
   string id = 2 [ (gogoproto.customname) = "ID" ];
   bytes payload = 3;
+  bytes feegranter = 4 [ (gogoproto.casttype) =
+                             "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
 }
 
 message RouteMessageResponse {}
