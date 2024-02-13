@@ -8,7 +8,7 @@ import "cosmos/vesting/v1beta1/vesting.proto";
 import "cosmos/msg/v1/msg.proto";
 import "amino/amino.proto";
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/auth/vesting/types";
+option go_package = "cosmossdk.io/x/auth/vesting/types";
 
 // Msg defines the bank Msg service.
 service Msg {
@@ -49,6 +49,10 @@ message MsgCreateVestingAccount {
   // end of vesting as unix time (in seconds).
   int64 end_time = 4;
   bool  delayed  = 5;
+  // start of vesting as unix time (in seconds).
+  //
+  // Since 0.51.x
+  int64 start_time = 6;
 }
 
 // MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response type.
