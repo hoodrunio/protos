@@ -31,6 +31,9 @@ cp -r c4e-chain/proto/* ../
 git clone https://github.com/Agoric/agoric-sdk
 cp -r agoric-sdk/golang/cosmos/proto/* ../
 
+git clone https://github.com/babylonchain/babylon
+cp -r babylon/proto/* ../
+
 cd ..
 rm -rf temp
 
