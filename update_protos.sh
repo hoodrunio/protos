@@ -6,7 +6,7 @@ cd temp
 git clone https://github.com/axelarnetwork/axelar-core
 cp -r axelar-core/proto/* ../
 
-git clone https://github.com/babylonchain/babylon
+git clone https://github.com/babylonlabs-io/babylon
 cp -r babylon/proto/* ../
 
 cd ..
