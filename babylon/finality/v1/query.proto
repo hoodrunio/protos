@@ -18,7 +18,7 @@ service Query {
 
   // ListPublicRandomness is a range query for public randomness of a given finality provider
   // NOTE: Babylon only has the knowledge of public randomness that is already revealed by
-  // finality providers, i.e., the finality provider alreayd provides a finality signature
+  // finality providers, i.e., the finality provider already provides a finality signature
   // at the corresponding height
   // TODO: remove public randomness storage?
   rpc ListPublicRandomness(QueryListPublicRandomnessRequest) returns (QueryListPublicRandomnessResponse) {
@@ -102,6 +102,8 @@ message PubRandCommitResponse {
   uint64 num_pub_rand = 1;
   // commitment is the value of the commitment
   bytes commitment = 2;
+  // epoch_num defines the epoch number that the commit falls into
+  uint64 epoch_num = 3;
 }
 
 // QueryListPubRandCommitRequest is the request type for the
