@@ -9,9 +9,15 @@ option go_package = "github.com/babylonlabs-io/babylon/x/btcstaking/types";
 // VotingPowerDistCache is the cache for voting power distribution of finality providers
 // and their BTC delegations at a height
 message VotingPowerDistCache {
-    uint64 total_voting_power = 1;
+    option (gogoproto.goproto_getters) = false;
+    // total_sat is the total amount of bonded BTC stake (in Satoshi) of all the finality providers
+    // in the cache
+    uint64 total_bonded_sat = 1;
     // finality_providers is a list of finality providers' voting power information
     repeated FinalityProviderDistInfo finality_providers = 2;
+    // num_active_fps is the number of finality providers that have active BTC
+    // delegations as well as timestamped public randomness
+    uint32 num_active_fps = 3;
 }
 
 // FinalityProviderDistInfo is the reward distribution of a finality provider and its BTC delegations
@@ -26,13 +32,23 @@ message FinalityProviderDistInfo {
         (cosmos_proto.scalar)  = "cosmos.Dec",
         (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec"
     ];
-    // total_voting_power is the total voting power of the finality provider
-    uint64 total_voting_power = 4;
+    // total_bonded_sat is the total amount of bonded BTC stake (in Satoshi) of the finality provider
+    uint64 total_bonded_sat = 4;
     // btc_dels is a list of BTC delegations' voting power information under this finality provider
     repeated BTCDelDistInfo btc_dels = 5;
+    // is_timestamped indicates whether the finality provider
+    // has timestamped public randomness committed
+    // if no, it should not be assigned voting power
+    bool is_timestamped = 6;
+    // is_jailed indicates whether the finality provider
+    // is jailed, if so, it should not be assigned voting power
+    bool is_jailed = 7;
+    // is_slashed indicates whether the finality provider
+    // is slashed, if so, it should not be assigned voting power
+    bool is_slashed = 8;
 }
 
-// BTCDelDistInfo contains the information related to reward distribution for a BTC delegation
+// BTCDelDistInfo contains the information related to voting power distribution for a BTC delegation
 message BTCDelDistInfo {
     // btc_pk is the Bitcoin secp256k1 PK of this BTC delegation
     // the PK follows encoding in BIP-340 spec
@@ -41,6 +57,6 @@ message BTCDelDistInfo {
     string staker_addr = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
     // staking_tx_hash is the staking tx hash of the BTC delegation
     string staking_tx_hash = 3;
-    // voting_power is the voting power of the BTC delegation
-    uint64 voting_power = 4;
+    // total_sat is the amount of BTC stake (in Satoshi) of the BTC delegation
+    uint64 total_sat = 4;
 }

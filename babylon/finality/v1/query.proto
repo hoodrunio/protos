@@ -6,6 +6,8 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "babylon/finality/v1/params.proto";
 import "babylon/finality/v1/finality.proto";
+import "google/protobuf/timestamp.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/babylonlabs-io/babylon/x/finality/types";
 
@@ -18,7 +20,7 @@ service Query {
 
   // ListPublicRandomness is a range query for public randomness of a given finality provider
   // NOTE: Babylon only has the knowledge of public randomness that is already revealed by
-  // finality providers, i.e., the finality provider alreayd provides a finality signature
+  // finality providers, i.e., the finality provider already provides a finality signature
   // at the corresponding height
   // TODO: remove public randomness storage?
   rpc ListPublicRandomness(QueryListPublicRandomnessRequest) returns (QueryListPublicRandomnessResponse) {
@@ -102,6 +104,8 @@ message PubRandCommitResponse {
   uint64 num_pub_rand = 1;
   // commitment is the value of the commitment
   bytes commitment = 2;
+  // epoch_num defines the epoch number that the commit falls into
+  uint64 epoch_num = 3;
 }
 
 // QueryListPubRandCommitRequest is the request type for the
@@ -192,10 +196,33 @@ message QueryEvidenceRequest {
   string fp_btc_pk_hex = 1;
 }
 
+// Evidence is the evidence that a finality provider has signed finality
+// signatures with correct public randomness on two conflicting Babylon headers
+message EvidenceResponse {
+    // fp_btc_pk_hex is the BTC PK of the finality provider that casts this vote
+    string fp_btc_pk_hex = 1;
+    // block_height is the height of the conflicting blocks
+    uint64 block_height = 2;
+    // pub_rand is the public randomness the finality provider has committed to
+    bytes pub_rand = 3 [ (gogoproto.customtype) = "github.com/babylonlabs-io/babylon/types.SchnorrPubRand" ];
+    // canonical_app_hash is the AppHash of the canonical block
+    bytes canonical_app_hash = 4;
+    // fork_app_hash is the AppHash of the fork block
+    bytes fork_app_hash = 5;
+    // canonical_finality_sig is the finality signature to the canonical block
+    // where finality signature is an EOTS signature, i.e.,
+    // the `s` in a Schnorr signature `(r, s)`
+    // `r` is the public randomness that is already committed by the finality provider
+    bytes canonical_finality_sig = 6 [ (gogoproto.customtype) = "github.com/babylonlabs-io/babylon/types.SchnorrEOTSSig" ];
+    // fork_finality_sig is the finality signature to the fork block
+    // where finality signature is an EOTS signature
+    bytes fork_finality_sig = 7 [ (gogoproto.customtype) = "github.com/babylonlabs-io/babylon/types.SchnorrEOTSSig" ];
+}
+
 // QueryEvidenceResponse is the response type for the
 // Query/Evidence RPC method.
 message QueryEvidenceResponse {
-  Evidence evidence = 1;
+  EvidenceResponse evidence = 1;
 }
 
 // QueryListEvidencesRequest is the request type for the
@@ -213,7 +240,7 @@ message QueryListEvidencesRequest {
 // Query/ListEvidences RPC method.
 message QueryListEvidencesResponse {
   // blocks is the list of evidences
-  repeated Evidence evidences = 1;
+  repeated EvidenceResponse evidences = 1;
 
   // pagination defines the pagination in the response.
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
@@ -227,11 +254,24 @@ message QuerySigningInfoRequest {
   string fp_btc_pk_hex = 1;
 }
 
+// SigningInfoResponse defines the API response containing a finality provider's signing info
+// for monitoring their liveness activity.
+message SigningInfoResponse {
+  // fp_btc_pk is the BTC PK of the finality provider that casts this vote
+  string fp_btc_pk_hex = 1;
+  // start_height is the block height at which finality provider become active
+  int64 start_height = 2;
+  // missed_blocks_counter defines a counter to avoid unnecessary array reads.
+  // Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
+  int64 missed_blocks_counter = 3;
+   // Timestamp until which the validator is jailed due to liveness downtime.
+  google.protobuf.Timestamp jailed_until = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
 // QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
 // method
 message QuerySigningInfoResponse {
-  // fp_signing_info is the signing info of requested finality provider BTC public key
-  FinalityProviderSigningInfo fp_signing_info = 1 [(gogoproto.nullable) = false];
+  SigningInfoResponse signing_info = 1 [(gogoproto.nullable) = false];
 }
 
 // QuerySigningInfosRequest is the request type for the Query/SigningInfos RPC
@@ -244,6 +284,6 @@ message QuerySigningInfosRequest {
 // method
 message QuerySigningInfosResponse {
   // info is the signing info of all finality providers with signing info
-  repeated FinalityProviderSigningInfo fp_signing_infos = 1 [(gogoproto.nullable) = false];
+  repeated SigningInfoResponse signing_infos = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
