@@ -5,7 +5,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "umee/leverage/v1/leverage.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/umee-network/umee/v4/x/leverage/types";
+option go_package = "github.com/umee-network/umee/v6/x/leverage/types";
 
 option (gogoproto.goproto_getters_all) = false;
 
@@ -26,6 +26,7 @@ message GenesisState {
     (gogoproto.nullable)     = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  repeated SpecialAssetPair special_pairs = 10 [(gogoproto.nullable) = false];
 }
 
 // AdjustedBorrow is a borrow struct used in the leverage module's genesis

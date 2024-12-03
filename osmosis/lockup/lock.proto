@@ -1,12 +1,12 @@
 syntax = "proto3";
 package osmosis.lockup;
 
+import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/osmosis-labs/osmosis/v12/x/lockup/types";
+option go_package = "github.com/quicksilver-zone/quicksilver/third-party-chains/osmosis-types/lockup";
 
 // PeriodLock is a single lock unit by period defined by the x/lockup module.
 // It's a record of a locked coin at a specific time. It stores owner, duration,
@@ -20,7 +20,7 @@ message PeriodLock {
   uint64 ID = 1;
   // Owner is the account address of the lock owner.
   // Only the owner can modify the state of the lock.
-  string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+  string owner = 2 [(gogoproto.moretags) = "yaml:\"owner\""];
   // Duration is the time needed for a lock to mature after unlocking has
   // started.
   google.protobuf.Duration duration = 3 [
@@ -42,6 +42,10 @@ message PeriodLock {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // Reward Receiver Address is the address that would be receiving rewards for
+  // the incentives for the lock. This is set to owner by default and can be
+  // changed via separate msg.
+  string reward_receiver_address = 6 [(gogoproto.moretags) = "yaml:\"reward_receiver_address\""];
 }
 
 // LockQueryType defines the type of the lock query that can
@@ -51,6 +55,8 @@ enum LockQueryType {
 
   ByDuration = 0;
   ByTime = 1;
+  NoLock = 2;
+  ByGroup = 3;
 }
 
 // QueryCondition is a struct used for querying locks upon different conditions.

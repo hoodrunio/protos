@@ -2,17 +2,15 @@ syntax = "proto3";
 
 package kyve.pool.v1beta1;
 
+import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/KYVENetwork/chain/x/pool/types";
 
 // Msg defines the Msg service.
 service Msg {
-  // FundPool ...
-  rpc FundPool(MsgFundPool) returns (MsgFundPoolResponse);
-  // DefundPool ...
-  rpc DefundPool(MsgDefundPool) returns (MsgDefundPoolResponse);
-
+  option (cosmos.msg.v1.service) = true;
   // CreatePool defines a governance operation for creating a new pool.
   // The authority is hard-coded to the x/gov module account.
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
@@ -31,36 +29,14 @@ service Msg {
   // CancelRuntimeUpgrade defines a governance operation for cancelling a runtime upgrade.
   // The authority is hard-coded to the x/gov module account.
   rpc CancelRuntimeUpgrade(MsgCancelRuntimeUpgrade) returns (MsgCancelRuntimeUpgradeResponse);
+  // UpdateParams defines a governance operation for updating the x/pool module
+  // parameters. The authority is hard-coded to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
-
-// MsgFundPool defines a SDK message for funding a pool.
-message MsgFundPool {
-  // creator ...
-  string creator = 1;
-  // id ...
-  uint64 id = 2;
-  // amount ...
-  uint64 amount = 3;
-}
-
-// MsgFundPoolResponse defines the Msg/DefundPool response type.
-message MsgFundPoolResponse {}
-
-// MsgDefundPool defines a SDK message for defunding a pool.
-message MsgDefundPool {
-  // creator ...
-  string creator = 1;
-  // id ...
-  uint64 id = 2;
-  // amount ...
-  uint64 amount = 3;
-}
-
-// MsgDefundPoolResponse defines the Msg/DefundPool response type.
-message MsgDefundPoolResponse {}
 
 // MsgCreatePool defines a SDK message for creating a new pool.
 message MsgCreatePool {
+  option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // name ...
@@ -75,8 +51,11 @@ message MsgCreatePool {
   string start_key = 6;
   // upload_interval ...
   uint64 upload_interval = 7;
-  // operating_cost ...
-  uint64 operating_cost = 8;
+  // inflation_share_weight ...
+  string inflation_share_weight = 8 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
   // min_delegation ...
   uint64 min_delegation = 9;
   // max_bundle_size ...
@@ -89,6 +68,8 @@ message MsgCreatePool {
   uint32 storage_provider_id = 13;
   // compression_id ...
   uint32 compression_id = 14;
+  // end_key ...
+  string end_key = 15;
 }
 
 // MsgCreatePoolResponse defines the Msg/CreatePool response type.
@@ -96,6 +77,7 @@ message MsgCreatePoolResponse {}
 
 // MsgUpdatePool defines a SDK message for updating an existing pool.
 message MsgUpdatePool {
+  option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // id ...
@@ -109,6 +91,7 @@ message MsgUpdatePoolResponse {}
 
 // MsgDisablePool defines a SDK message for disabling an existing pool.
 message MsgDisablePool {
+  option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // id ...
@@ -120,6 +103,7 @@ message MsgDisablePoolResponse {}
 
 // MsgEnablePool defines a SDK message for enabling an existing pool.
 message MsgEnablePool {
+  option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // id ...
@@ -131,6 +115,7 @@ message MsgEnablePoolResponse {}
 
 // MsgScheduleRuntimeUpgrade defines a SDK message for scheduling a runtime upgrade.
 message MsgScheduleRuntimeUpgrade {
+  option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // runtime ...
@@ -150,6 +135,7 @@ message MsgScheduleRuntimeUpgradeResponse {}
 
 // MsgCancelRuntimeUpgrade defines a SDK message for cancelling a runtime upgrade.
 message MsgCancelRuntimeUpgrade {
+  option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // runtime ...
@@ -158,3 +144,16 @@ message MsgCancelRuntimeUpgrade {
 
 // MsgCancelRuntimeUpgradeResponse defines the Msg/CancelRuntimeUpgrade response type.
 message MsgCancelRuntimeUpgradeResponse {}
+
+// MsgUpdateParams defines a SDK message for updating the module parameters.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // payload defines the x/stakers parameters to update.
+  string payload = 2;
+}
+
+// MsgUpdateParamsResponse defines the Msg/UpdateParams response type.
+message MsgUpdateParamsResponse {}

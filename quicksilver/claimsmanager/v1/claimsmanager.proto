@@ -5,7 +5,7 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "tendermint/crypto/proof.proto";
 
-option go_package = "github.com/ingenuity-build/quicksilver/x/claimsmanager/types";
+option go_package = "github.com/quicksilver-zone/quicksilver/x/claimsmanager/types";
 
 enum ClaimType {
   option (gogoproto.goproto_enum_prefix) = false;
@@ -14,8 +14,10 @@ enum ClaimType {
   ClaimTypeUndefined = 0;
   ClaimTypeLiquidToken = 1;
   ClaimTypeOsmosisPool = 2;
-  ClaimTypeCrescentPool = 3;
-  ClaimTypeSifchainPool = 4;
+  ClaimTypeCrescentPool = 3 [deprecated = true];
+  ClaimTypeSifchainPool = 4 [deprecated = true];
+  ClaimTypeUmeeToken = 5;
+  ClaimTypeOsmosisCLPool = 6;
 }
 
 // Params holds parameters for the claimsmanager module.
@@ -32,7 +34,12 @@ message Claim {
   string chain_id = 2;
   ClaimType module = 3;
   string source_chain_id = 4;
-  uint64 amount = 5;
+  uint64 _amount = 5 [deprecated = true];
+  string amount = 6 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
 }
 
 // Proof defines a type used to cryptographically prove a claim.

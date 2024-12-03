@@ -5,14 +5,24 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "quicksilver/claimsmanager/v1/claimsmanager.proto";
+import "quicksilver/participationrewards/v1/proposals.proto";
 
-option go_package = "github.com/ingenuity-build/quicksilver/x/participationrewards/types";
+option go_package = "github.com/quicksilver-zone/quicksilver/x/participationrewards/types";
 
 // Msg defines the participationrewards Msg service.
 service Msg {
   rpc SubmitClaim(MsgSubmitClaim) returns (MsgSubmitClaimResponse) {
     option (google.api.http) = {
       post: "/quicksilver/tx/v1/participationrewards/claim"
+      body: "*"
+    };
+  }
+
+  // SignalIntent defines a method for signalling voting intent for one or more
+  // validators.
+  rpc GovRemoveProtocolData(MsgGovRemoveProtocolData) returns (MsgGovRemoveProtocolDataResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/participationrewards/remove_protocoldata"
       body: "*"
     };
   }

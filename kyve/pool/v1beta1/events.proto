@@ -2,7 +2,21 @@ syntax = "proto3";
 
 package kyve.pool.v1beta1;
 
+import "gogoproto/gogo.proto";
+import "kyve/pool/v1beta1/params.proto";
+
 option go_package = "github.com/KYVENetwork/chain/x/pool/types";
+
+// EventUpdateParams is an event emitted when the module parameters are updated.
+// emitted_by: MsgUpdateParams
+message EventUpdateParams {
+  // old_params is the module's old parameters.
+  kyve.pool.v1beta1.Params old_params = 1 [(gogoproto.nullable) = false];
+  // new_params is the module's new parameters.
+  kyve.pool.v1beta1.Params new_params = 2 [(gogoproto.nullable) = false];
+  // payload is the parameter updates that were performed.
+  string payload = 3;
+}
 
 // EventCreatePool ...
 // emitted_by: EndBlock(gov)
@@ -24,9 +38,12 @@ message EventCreatePool {
   // upload_interval is the interval the pool should validate
   // bundles with
   uint64 upload_interval = 7;
-  // operating_cost is the fixed cost which gets paid out
+  // inflation_share_weight is the fixed cost which gets paid out
   // to every successful uploader
-  uint64 operating_cost = 8;
+  string inflation_share_weight = 8 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
   // min_delegation is the minimum amount of $KYVE the pool has
   // to have in order to produce bundles
   uint64 min_delegation = 9;
@@ -43,6 +60,9 @@ message EventCreatePool {
   // compression_id is the unique id of the compression type the bundles
   // get compressed with
   uint32 compression_id = 14;
+  // end_key is the last key before the pool should stop indexing, it is
+  // inclusive
+  string end_key = 15;
 }
 
 // EventPoolEnabled ...
@@ -107,9 +127,12 @@ message EventPoolUpdated {
   // upload_interval is the interval the pool should validate
   // bundles with
   uint64 upload_interval = 7;
-  // operating_cost is the fixed cost which gets paid out
+  // inflation_share_weight is the fixed cost which gets paid out
   // to every successful uploader
-  uint64 operating_cost = 8;
+  string inflation_share_weight = 8 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
   // min_delegation is the minimum amount of $KYVE the pool has
   // to have in order to produce bundles
   uint64 min_delegation = 9;
@@ -124,28 +147,6 @@ message EventPoolUpdated {
   uint32 compression_id = 12;
 }
 
-// EventFundPool is an event emitted when a pool is funded.
-// emitted_by: MsgFundPool
-message EventFundPool {
-  // pool_id is the unique ID of the pool.
-  uint64 pool_id = 1;
-  // address is the account address of the pool funder.
-  string address = 2;
-  // amount is the amount in ukyve the funder has funded
-  uint64 amount = 3;
-}
-
-// EventDefundPool is an event emitted when a pool is defunded.
-// emitted_by: MsgDefundPool
-message EventDefundPool {
-  // pool_id is the unique ID of the pool.
-  uint64 pool_id = 1;
-  // address is the account address of the pool funder.
-  string address = 2;
-  // amount is the amount in ukyve the funder has defunded
-  uint64 amount = 3;
-}
-
 // EventDefundPool is an event emitted when a pool is defunded.
 // emitted_by: MsgSubmitBundleProposal
 message EventPoolFundsSlashed {
@@ -155,11 +156,4 @@ message EventPoolFundsSlashed {
   string address = 2;
   // amount is the amount in ukyve the validator has lost due to the slash
   uint64 amount = 3;
-}
-
-// EventPoolOutOfFunds is an event emitted when a pool has run out of funds
-// emitted_by: MsgSubmitBundleProposal
-message EventPoolOutOfFunds {
-  // pool_id is the unique ID of the pool.
-  uint64 pool_id = 1;
 }
