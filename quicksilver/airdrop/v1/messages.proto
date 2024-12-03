@@ -8,7 +8,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "quicksilver/claimsmanager/v1/claimsmanager.proto";
 
-option go_package = "github.com/ingenuity-build/quicksilver/x/airdrop/types";
+option go_package = "github.com/quicksilver-zone/quicksilver/x/airdrop/types";
 
 // Msg defines the airdrop Msg service.
 service Msg {
@@ -59,6 +59,8 @@ message MsgIncentivePoolSpend {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  string title = 4;
+  string description = 5;
 }
 
 // MsgIncentivePoolSpendResponse defines the MsgIncentivePoolSpend response type.

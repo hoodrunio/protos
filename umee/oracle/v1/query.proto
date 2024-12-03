@@ -7,7 +7,7 @@ import "umee/oracle/v1/oracle.proto";
 import "umee/oracle/v1/genesis.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/umee-network/umee/v4/x/oracle/types";
+option go_package = "github.com/umee-network/umee/v6/x/oracle/types";
 
 option (gogoproto.goproto_getters_all) = false;
 
@@ -65,7 +65,7 @@ service Query {
   rpc AggregateVote(QueryAggregateVote)
       returns (QueryAggregateVoteResponse) {
     option (google.api.http).get =
-        "/umee/oracle/v1/valdiators/{validator_addr}/aggregate_vote";
+        "/umee/oracle/v1/validators/{validator_addr}/aggregate_vote";
   }
 
   // AggregateVotes returns aggregate votes of all validators
@@ -101,6 +101,63 @@ service Query {
     option (google.api.http).get =
         "/umee/historacle/v1/avg_price/{denom}";
   }
+
+  // ExgRatesWithTimestamp returns exchange rates of all denoms with timestamp,
+  // or, if specified, returns a single denom
+  rpc ExgRatesWithTimestamp(QueryExgRatesWithTimestamp)
+      returns (QueryExgRatesWithTimestampResponse) {
+    option (google.api.http).get =
+        "/umee/oracle/v1/denoms/exg_rates_timestamp";
+  }
+
+  // MissCounters returns oracle missing votes count of validators.
+  rpc MissCounters(QueryMissCounters)
+      returns (QueryMissCountersResponse) {
+    option (google.api.http).get =
+        "/umee/oracle/v1/miss_counters";
+  }
+}
+
+// QueryMissCounters is the request type for the Query/MissCounters RPC
+// method.
+message QueryMissCounters {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+  string validator                   = 1;
+}
+
+// QueryMissCountersResponse is response type for the Query/MissCounters RPC method.
+message QueryMissCountersResponse {
+  repeated PriceMissCounter miss_counters = 1 [
+    (gogoproto.nullable) = false
+  ];
+}
+
+// PriceMissCounter is the validator's oracle price votes missing count.
+message PriceMissCounter {
+  string validator = 1;
+  // miss_counter defines the oracle miss counter of a validator
+  uint64 miss_counter = 2;
+}
+
+// QueryExgRatesWithTimestamp is the request type for the Query/ExchangeRatesWithTimestamp RPC
+// method.
+message QueryExgRatesWithTimestamp {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // denom defines the denomination to query for.
+  string denom = 1;
+}
+
+// QueryExgRatesWithTimestampResponse is response type for the
+// Query/ExchangeRatesWithTimestamp RPC method.
+message QueryExgRatesWithTimestampResponse {
+  // exchange_rates defines a list of the exchange rate for all whitelisted
+  // denoms with timestamp
+  repeated DenomExchangeRate exg_rates = 1 [
+    (gogoproto.nullable) = false
+  ];
 }
 
 // QueryExchangeRates is the request type for the Query/ExchangeRate RPC

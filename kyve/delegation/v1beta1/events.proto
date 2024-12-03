@@ -77,8 +77,8 @@ message EventWithdrawRewards {
   string address = 1;
   // staker is the account address of the protocol node the users withdraws from.
   string staker = 2;
-  // amount ...
-  uint64 amount = 3;
+  // amounts ...
+  string amounts = 3;
 }
 
 // EventSlash is an event emitted when a protocol node is slashed.

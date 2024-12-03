@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package kyve.query.v1beta1;
 
+import "amino/amino.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "kyve/pool/v1beta1/pool.proto";
 
@@ -38,15 +40,22 @@ message BasicPool {
   // logo of the pool
   string logo = 4;
 
-  // operating_cost is the base payout for each bundle reward
-  uint64 operating_cost = 5;
+  // inflation_share_weight is the base payout for each bundle reward
+  string inflation_share_weight = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
 
   // upload_interval is the interval bundles get created
   uint64 upload_interval = 6;
 
   // total_funds of the pool. If the pool runs
   // out of funds no more bundles will be produced
-  uint64 total_funds = 7;
+  repeated cosmos.base.v1beta1.Coin total_funds = 7 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
 
   // total_delegation of the pool
   uint64 total_delegation = 8;
@@ -96,7 +105,7 @@ message StakerMetadata {
   // get transferred to the staker before the remaining
   // rewards are split across all delegators
   string commission = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
@@ -122,6 +131,13 @@ message StakerMetadata {
   // the commission is applied. Users have time to redelegate
   // if they not agree with the new commission.
   CommissionChangeEntry pending_commission_change = 7;
+
+  // commission_rewards are the rewards through commission and storage cost
+  repeated cosmos.base.v1beta1.Coin commission_rewards = 8 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
 }
 
 // CommissionChangeEntry shows when the old commission
@@ -130,7 +146,7 @@ message CommissionChangeEntry {
   // commission is the new commission that will
   // become active once the change-time is over
   string commission = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 

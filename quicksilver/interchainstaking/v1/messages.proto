@@ -7,7 +7,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "quicksilver/interchainstaking/v1/proposals.proto";
 
-option go_package = "github.com/ingenuity-build/quicksilver/x/interchainstaking/types";
+option go_package = "github.com/quicksilver-zone/quicksilver/x/interchainstaking/types";
 
 // Msg defines the interchainstaking Msg service.
 service Msg {
@@ -28,6 +28,31 @@ service Msg {
     };
   }
 
+  // CancelRedemption defines a method for cancelling a redemption request and
+  // returning the escrowed assets.
+  rpc CancelRedemption(MsgCancelRedemption) returns (MsgCancelRedemptionResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/interchainstaking/cancel_redemption"
+      body: "*"
+    };
+  }
+
+  // RequeueRedemption defines a method for requeuing a failed redemption.
+  rpc RequeueRedemption(MsgRequeueRedemption) returns (MsgRequeueRedemptionResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/interchainstaking/requeue_redemption"
+      body: "*"
+    };
+  }
+
+  // UpdateRedemption defines a method for updating a redemption.
+  rpc UpdateRedemption(MsgUpdateRedemption) returns (MsgUpdateRedemptionResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/interchainstaking/update_redemption"
+      body: "*"
+    };
+  }
+
   // SignalIntent defines a method for signalling voting intent for one or more
   // validators.
   rpc GovCloseChannel(MsgGovCloseChannel) returns (MsgGovCloseChannelResponse) {
@@ -40,6 +65,27 @@ service Msg {
   rpc GovReopenChannel(MsgGovReopenChannel) returns (MsgGovReopenChannelResponse) {
     option (google.api.http) = {
       post: "/quicksilver/tx/v1/interchainstaking/reopen_channel"
+      body: "*"
+    };
+  }
+
+  rpc GovSetLsmCaps(MsgGovSetLsmCaps) returns (MsgGovSetLsmCapsResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/interchainstaking/reopen_channel"
+      body: "*"
+    };
+  }
+
+  rpc GovAddValidatorDenyList(MsgGovAddValidatorDenyList) returns (MsgGovAddValidatorDenyListResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/interchainstaking/add_validator_denylist"
+      body: "*"
+    };
+  }
+
+  rpc GovRemoveValidatorDenyList(MsgGovRemoveValidatorDenyList) returns (MsgGovRemoveValidatorDenyListResponse) {
+    option (google.api.http) = {
+      post: "/quicksilver/tx/v1/interchainstaking/remove_validator_denylist"
       body: "*"
     };
   }
@@ -59,6 +105,54 @@ message MsgRequestRedemption {
   string from_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
+// MsgRequestRedemptionResponse defines the MsgRequestRedemption response type.
+message MsgRequestRedemptionResponse {}
+
+// MsgCancelRedemption represents a message type to cancel .
+message MsgCancelRedemption {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string chain_id = 1;
+  string hash = 2;
+  string from_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgCancelRedemptionResponse defines the MsgCancelRedemption response type.
+message MsgCancelRedemptionResponse {
+  cosmos.base.v1beta1.Coin returned = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"coin\""
+  ];
+}
+
+// MsgUpdateRedemption represents a message type to update a redemption.
+message MsgUpdateRedemption {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string chain_id = 1;
+  string hash = 2;
+  int32 new_status = 3;
+  string from_address = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgUpdateRedemptionResponse defines the MsgUpdateRedemption response type.
+message MsgUpdateRedemptionResponse {}
+
+// MsgRequeueRedemption represents a message type to requeue.
+message MsgRequeueRedemption {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string chain_id = 1;
+  string hash = 2;
+  string from_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgRequeueRedemptionResponse defines the MsgRequeueRedemption response type.
+message MsgRequeueRedemptionResponse {}
+
 // MsgSignalIntent represents a message type for signalling voting intent for
 // one or more validators.
 message MsgSignalIntent {
@@ -69,9 +163,6 @@ message MsgSignalIntent {
   string intents = 2 [(gogoproto.moretags) = "yaml:\"intents\""];
   string from_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
-
-// MsgRequestRedemptionResponse defines the MsgRequestRedemption response type.
-message MsgRequestRedemptionResponse {}
 
 // MsgSignalIntentResponse defines the MsgSignalIntent response type.
 message MsgSignalIntentResponse {}

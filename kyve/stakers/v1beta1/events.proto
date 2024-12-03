@@ -27,7 +27,7 @@ message EventCreateStaker {
   uint64 amount = 2;
   // commission
   string commission = 3 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 }
@@ -56,9 +56,18 @@ message EventUpdateCommission {
   string staker = 1;
   // commission ...
   string commission = 2 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
+}
+
+// EventClaimCommissionRewards ...
+// emitted_by: MsgClaimCommissionRewards
+message EventClaimCommissionRewards {
+  // staker is the account address of the protocol node.
+  string staker = 1;
+  // amounts is the amount of the commission rewards claimed
+  string amounts = 2;
 }
 
 // EventJoinPool ...

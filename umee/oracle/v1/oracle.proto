@@ -3,8 +3,9 @@ package umee.oracle.v1;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
-option go_package = "github.com/umee-network/umee/v4/x/oracle/types";
+option go_package = "github.com/umee-network/umee/v6/x/oracle/types";
 
 option (gogoproto.goproto_getters_all) = false;
 
@@ -57,10 +58,27 @@ message Params {
   uint64 maximum_median_stamps = 12;
 }
 
+// AvgCounterParams - Historic avg counter params
+message AvgCounterParams {
+  // avg_period
+  google.protobuf.Duration avg_period = 1 [
+    (gogoproto.nullable)    = false,
+    (gogoproto.stdduration) = true,
+    (gogoproto.jsontag)     = "avg_period,omitempty",
+    (gogoproto.moretags)    = "yaml:\"avg_period\""
+  ];
+  // avg shift
+  google.protobuf.Duration avg_shift = 2 [
+    (gogoproto.nullable)    = false,
+    (gogoproto.stdduration) = true,
+    (gogoproto.jsontag)     = "avg_shift,omitempty",
+    (gogoproto.moretags)    = "yaml:\"avg_shift\""
+  ];
+}
+
 // Denom - the object to hold configurations of each denom
 message Denom {
   option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
 
   string base_denom   = 1 [(gogoproto.moretags) = "yaml:\"base_denom\""];
@@ -75,7 +93,6 @@ message Denom {
 // rate}{denom},...,{exchange rate}{denom}:{voter}")
 message AggregateExchangeRatePrevote {
   option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
 
   string hash         = 1 [(gogoproto.moretags) = "yaml:\"hash\""];
@@ -87,7 +104,6 @@ message AggregateExchangeRatePrevote {
 // the exchange rates of USD denominated in various assets.
 message AggregateExchangeRateVote {
   option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
 
   repeated ExchangeRateTuple exchange_rate_tuples = 1 [
@@ -102,7 +118,6 @@ message AggregateExchangeRateVote {
 // ExchangeRateTuple - struct to store interpreted exchange rates data to store
 message ExchangeRateTuple {
   option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
 
   string denom         = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
@@ -128,4 +143,16 @@ message AvgCounter {
   uint32 num = 2;
   // Unix timestamp when the first price was aggregated in the counter
   google.protobuf.Timestamp start = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+}
+
+// DenomExchangeRate stores exchange rate with timestamp
+message DenomExchangeRate {
+  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_stringer) = false;
+  string denom                        = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
+  string rate                         = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
+  google.protobuf.Timestamp timestamp = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }

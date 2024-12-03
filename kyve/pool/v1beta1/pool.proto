@@ -10,18 +10,31 @@ option go_package = "github.com/KYVENetwork/chain/x/pool/types";
 enum PoolStatus {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // POOL_STATUS_UNSPECIFIED ...
+  // POOL_STATUS_UNSPECIFIED indicates an unknown status, likely
+  // due to an error
   POOL_STATUS_UNSPECIFIED = 0;
-  // POOL_STATUS_ACTIVE ...
+  // POOL_STATUS_ACTIVE indicates, that the pool is running
+  // normally
   POOL_STATUS_ACTIVE = 1;
-  // POOL_STATUS_DISABLED ...
+  // POOL_STATUS_DISABLED indicates, that the pool was disabled
+  // by the governance and does not continue until it is enabled
+  // by the governance again
   POOL_STATUS_DISABLED = 2;
-  // POOL_STATUS_NO_FUNDS ...
+  // POOL_STATUS_NO_FUNDS indicates, that the pool currently has no
+  // funds, but is continuing normally anyway, due to inflation splitting
   POOL_STATUS_NO_FUNDS = 3;
-  // POOL_STATUS_NOT_ENOUGH_DELEGATION ...
+  // POOL_STATUS_NOT_ENOUGH_DELEGATION indicates, that the min delegation
+  // requirement has not been met and that the pool is halted
   POOL_STATUS_NOT_ENOUGH_DELEGATION = 4;
-  // POOL_STATUS_UPGRADING ...
+  // POOL_STATUS_UPGRADING indicates, that the runtime is currently
+  // being upgraded and that the pool is halted
   POOL_STATUS_UPGRADING = 5;
+  // POOL_STATUS_VOTING_POWER_TOO_HIGH indicates, that one validator
+  // has more than 50% voting power and that the pool is halted
+  POOL_STATUS_VOTING_POWER_TOO_HIGH = 6;
+  // POOL_STATUS_END_KEY_REACHED indicates, that the end key has been
+  // reached and that the pool is halted
+  POOL_STATUS_END_KEY_REACHED = 7;
 }
 
 // Protocol holds all info about the current pool version and the
@@ -49,15 +62,6 @@ message UpgradePlan {
   // during the upgrade to give all validators a chance of switching
   // to the new binaries
   uint64 duration = 4;
-}
-
-// Funder is the object which holds info about a single pool funder
-message Funder {
-  // address is the address of the funder
-  string address = 1;
-  // amount is the current amount of funds in ukyve the funder has
-  // still funded the pool with
-  uint64 amount = 2;
 }
 
 // Pool ...
@@ -88,8 +92,11 @@ message Pool {
 
   // upload_interval ...
   uint64 upload_interval = 11;
-  // operating_cost ...
-  uint64 operating_cost = 12;
+  // inflation_share_weight ...
+  string inflation_share_weight = 12 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
   // min_delegation ...
   uint64 min_delegation = 13;
   // max_bundle_size ...
@@ -99,18 +106,17 @@ message Pool {
   // Can only be done via governance.
   bool disabled = 15;
 
-  // funders ...
-  repeated Funder funders = 16;
-  // total_funds ...
-  uint64 total_funds = 17;
-
   // protocol ...
-  Protocol protocol = 18;
+  Protocol protocol = 16;
   // upgrade_plan ...
-  UpgradePlan upgrade_plan = 19;
+  UpgradePlan upgrade_plan = 17;
 
   // storage_provider_id ...
-  uint32 current_storage_provider_id = 20;
+  uint32 current_storage_provider_id = 18;
   // compression_id ...
-  uint32 current_compression_id = 21;
+  uint32 current_compression_id = 19;
+
+  // end_key is the last key before the pool should stop indexing, it is
+  // inclusive
+  string end_key = 20;
 }

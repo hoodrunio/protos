@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package kyve.pool.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/KYVENetwork/chain/x/pool/types";
+
+// Params defines the pool module parameters.
+message Params {
+  // protocol_inflation_share ...
+  string protocol_inflation_share = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // pool_inflation_payout_rate ...
+  string pool_inflation_payout_rate = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // max_voting_power_per_pool ...
+  string max_voting_power_per_pool = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
