@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package kyve.stakers.v1;
+
+import "gogoproto/gogo.proto";
+import "kyve/stakers/v1/params.proto";
+import "kyve/stakers/v1/stakers.proto";
+
+option go_package = "github.com/KYVENetwork/chain/x/stakers/types";
+
+// EventUpdateParams is an event emitted when the module parameters are updated.
+// emitted_by: MsgUpdateParams
+message EventUpdateParams {
+  // old_params is the module's old parameters.
+  kyve.stakers.v1.Params old_params = 1 [(gogoproto.nullable) = false];
+  // new_params is the module's new parameters.
+  kyve.stakers.v1.Params new_params = 2 [(gogoproto.nullable) = false];
+  // payload is the parameter updates that were performed.
+  string payload = 3;
+}
+
+// EventUpdateCommission ...
+// emitted_by: EndBlock
+message EventUpdateCommission {
+  // staker is the account address of the protocol node.
+  string staker = 1;
+  // pool_id ...
+  uint64 pool_id = 2;
+  // commission ...
+  string commission = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// EventUpdateCommission ...
+// emitted_by: MsgUpdateStakeFraction, EndBlock
+message EventUpdateStakeFraction {
+  // staker is the account address of the protocol node.
+  string staker = 1;
+  // pool_id ...
+  uint64 pool_id = 2;
+  // stake_fraction ...
+  string stake_fraction = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// EventClaimCommissionRewards ...
+// emitted_by: MsgClaimCommissionRewards
+message EventClaimCommissionRewards {
+  // staker is the account address of the protocol node.
+  string staker = 1;
+  // amounts is the amount of the commission rewards claimed
+  string amounts = 2;
+}
+
+// EventJoinPool ...
+// emitted_by: MsgJoinPool
+message EventJoinPool {
+  // pool_id is the pool the staker joined
+  uint64 pool_id = 1;
+  // staker is the address of the staker
+  string staker = 2;
+  // pool_address is the address of the protocol node which
+  // votes in favor of the staker
+  string pool_address = 3;
+  // amount is the amount of funds transferred to the pool address
+  uint64 amount = 4;
+  // commission ...
+  string commission = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  // stake_fraction ...
+  string stake_fraction = 6 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// EventLeavePool ...
+// emitted_by: EndBlock
+message EventLeavePool {
+  // pool_id ...
+  uint64 pool_id = 1;
+  // staker ...
+  string staker = 2;
+}
+
+// EventSlash is an event emitted when a protocol node is slashed.
+// emitted_by: MsgSubmitBundleProposal, EndBlock
+message EventSlash {
+  // pool_id is the unique ID of the pool.
+  uint64 pool_id = 1;
+  // staker is the account address of the protocol node.
+  string staker = 2;
+  // amount is the total amount that got slashed
+  uint64 amount = 3;
+  // slash_type is the type of the protocol slash
+  SlashType slash_type = 4;
+  // stake_fraction is the percentage of how much of the validators total
+  // bonded amount was under risk for slashing
+  string stake_fraction = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
