@@ -9,7 +9,7 @@ import "cosmos_proto/cosmos.proto";
 import "cosmos/query/v1/query.proto";
 import "amino/amino.proto";
 
-option go_package = "cosmossdk.io/x/staking/types";
+option go_package = "github.com/cosmos/cosmos-sdk/x/staking/types";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -292,10 +292,10 @@ message QueryRedelegationsRequest {
   string delegator_addr = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 
   // src_validator_addr defines the validator address to redelegate from.
-  string src_validator_addr = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string src_validator_addr = 2 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
 
   // dst_validator_addr defines the validator address to redelegate to.
-  string dst_validator_addr = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string dst_validator_addr = 3 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
 
   // pagination defines an optional pagination for the request.
   cosmos.base.query.v1beta1.PageRequest pagination = 4;
@@ -365,8 +365,7 @@ message QueryHistoricalInfoRequest {
 // method.
 message QueryHistoricalInfoResponse {
   // hist defines the historical info at the given height.
-  HistoricalInfo   hist              = 1 [deprecated = true];
-  HistoricalRecord historical_record = 2;
+  HistoricalInfo hist = 1;
 }
 
 // QueryPoolRequest is request type for the Query/Pool RPC method.

@@ -1,9 +1,8 @@
-// Since: cosmos-sdk 0.46
 syntax = "proto3";
 
 package cosmos.group.v1;
 
-option go_package = "cosmossdk.io/x/group";
+option go_package = "github.com/cosmos/cosmos-sdk/x/group";
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
@@ -304,14 +303,10 @@ message MsgSubmitProposal {
   Exec exec = 5;
 
   // title is the title of the proposal.
-  //
-  // Since: cosmos-sdk 0.47
-  string title = 6;
+  string title = 6 [(cosmos_proto.field_added_in) = "cosmos-sdk 0.47"];
 
   // summary is the summary of the proposal.
-  //
-  // Since: cosmos-sdk 0.47
-  string summary = 7;
+  string summary = 7 [(cosmos_proto.field_added_in) = "cosmos-sdk 0.47"];
 }
 
 // MsgSubmitProposalResponse is the Msg/SubmitProposal response type.
