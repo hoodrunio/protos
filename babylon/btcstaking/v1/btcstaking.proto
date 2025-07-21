@@ -10,7 +10,7 @@ import "babylon/btclightclient/v1/btclightclient.proto";
 import "amino/amino.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/babylonlabs-io/babylon/x/btcstaking/types";
+option go_package = "github.com/babylonlabs-io/babylon/v3/x/btcstaking/types";
 
 // FinalityProvider defines a finality provider
 message FinalityProvider {
@@ -27,7 +27,7 @@ message FinalityProvider {
   // the PK follows encoding in BIP-340 spec
   bytes btc_pk = 4
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
   // pop is the proof of possession of the btc_pk, where the BTC
   // private key signs the bech32 bbn addr of the finality provider.
   ProofOfPossessionBTC pop = 5;
@@ -44,10 +44,8 @@ message FinalityProvider {
   // highest_voted_height is the highest height for which the
   // finality provider has voted
   uint32 highest_voted_height = 9;
-  // consumer_id is the ID of the consumer the finality provider is operating
-  // on. If it's missing / empty, it's assumed the finality provider is
-  // operating in the Babylon chain.
-  string consumer_id = 10;
+  // bsn_id is the ID of the BSN the finality provider is securing
+  string bsn_id = 10;
   // commission_info contains information details of the finality provider commission.
   CommissionInfo commission_info = 11;
 }
@@ -81,7 +79,7 @@ message FinalityProviderWithMeta {
   // the PK follows encoding in BIP-340 spec
   bytes btc_pk = 1
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
   // height is the queried Babylon height
   uint64 height = 2;
   // voting_power is the voting power of this finality provider at the given
@@ -110,16 +108,15 @@ message BTCDelegation {
   // the PK follows encoding in BIP-340 spec
   bytes btc_pk = 2
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
   // pop is the proof of possession of babylon_pk and btc_pk
   ProofOfPossessionBTC pop = 3;
   // fp_btc_pk_list is the list of BIP-340 PKs of the finality providers that
   // this BTC delegation delegates to
-  // If there is more than 1 PKs, then this means the delegation is restaked
-  // to multiple finality providers
+  // If there are more than 1 PKs, then this means the delegation is multi-staked
   repeated bytes fp_btc_pk_list = 4
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
   // staking_time is the number of blocks for which the delegation is locked on
   // BTC chain
   uint32 staking_time = 5;
@@ -145,7 +142,7 @@ message BTCDelegation {
   // It will be a part of the witness for the staking tx output.
   bytes delegator_sig = 12
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340Signature" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340Signature" ];
   // covenant_sigs is a list of adaptor signatures on the slashing tx
   // by each covenant member
   // It will be a part of the witness for the staking tx output.
@@ -161,6 +158,31 @@ message BTCDelegation {
   // btc_tip_height is the height of the BTC light client tip at the time of
   // the delegation creation
   uint32 btc_tip_height = 17;
+  // stk_exp is contains the relevant information about the previous staking that
+  // originated this stake. If nil it is NOT a stake expansion.
+  StakeExpansion stk_exp = 18;
+}
+
+// StakeExpansion stores information necessary to construct the expanded BTC staking
+// transaction created from a previous BTC staking.
+message StakeExpansion {
+  // previous_staking_tx_hash is the hash of the staking tx that was used as
+  // input to the stake expansion.
+  bytes previous_staking_tx_hash = 1;
+
+  // other_funding_tx_out is the other funding output (TxOut) which was used
+  // as input to construct the BTC delegation. The stake expansion has a set of
+  // 2 inputs, the first input is the previous staking transaction and the
+  // second input (this one) is to pay for fees and optionally to add more
+  // stake to the BTC delegation.
+  bytes other_funding_tx_out = 2;
+
+  // previous_stk_covenant_sigs is a list of signatures on the stake expansion
+  // transaction (i.e., the transaction spending the previous staking transaction
+  // {previous_staking_tx_hash}) by each covenant member.
+  // It must be provided to allow the previous staking tx to be spent as
+  // an transaction input of another BTC staking transaction.
+  repeated SignatureInfo previous_stk_covenant_sigs = 3;
 }
 
 // DelegatorUnbondingInfo contains the information about transaction which spent
@@ -189,7 +211,7 @@ message BTCUndelegation {
   // It will be a part of the witness for the unbonding tx output.
   bytes delegator_slashing_sig = 3
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340Signature" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340Signature" ];
   // covenant_slashing_sigs is a list of adaptor signatures on the slashing tx
   // by each covenant member
   // It will be a part of the witness for the staking tx output.
@@ -243,10 +265,10 @@ enum BTCDelegationStatus {
 // SignatureInfo is a BIP-340 signature together with its signer's BIP-340 PK
 message SignatureInfo {
   bytes pk = 1 [ (gogoproto.customtype) =
-                     "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+                     "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
   bytes sig = 2
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340Signature" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340Signature" ];
 }
 
 // CovenantAdaptorSignatures is a list adaptor signatures signed by the
@@ -256,9 +278,10 @@ message CovenantAdaptorSignatures {
   // of the adaptor signature
   bytes cov_pk = 1
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
-  // adaptor_sigs is a list of adaptor signatures, each encrypted by a restaked
-  // BTC finality provider's public key
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
+  // adaptor_sigs is a list of adaptor signatures, each encrypted
+  // by the finality provider public keys involved in the multi-staking
+  // procedure
   repeated bytes adaptor_sigs = 2;
 }
 
@@ -276,7 +299,7 @@ message SelectiveSlashingEvidence {
   // launches the selective slashing offence
   bytes fp_btc_pk = 2
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+            "github.com/babylonlabs-io/babylon/v3/types.BIP340PubKey" ];
   // recovered_fp_btc_sk is the finality provider's BTC SK recovered from
   // the covenant adaptor/Schnorr signature pair. It is the consequence
   // of selective slashing.
