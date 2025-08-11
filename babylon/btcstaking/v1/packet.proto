@@ -5,7 +5,7 @@ import "cosmos/staking/v1beta1/staking.proto";
 import "babylon/btcstaking/v1/pop.proto";
 import "babylon/btcstaking/v1/btcstaking.proto";
 
-option go_package = "github.com/babylonlabs-io/babylon/x/btcstaking/types";
+option go_package = "github.com/babylonlabs-io/babylon/v3/x/btcstaking/types";
 
 // SlashedFinalityProvider carries a slashed finality provider on a consumer
 message SlashedFinalityProvider {
@@ -24,8 +24,7 @@ message SlashedFinalityProvider {
 message BTCStakingIBCPacket {
   repeated NewFinalityProvider new_fp = 1;
   repeated ActiveBTCDelegation active_del = 2;
-  repeated SlashedBTCDelegation slashed_del = 3;
-  repeated UnbondedBTCDelegation unbonded_del = 4;
+  repeated UnbondedBTCDelegation unbonded_del = 3;
 }
 
 // NewFinalityProvider is an IBC packet sent from Babylon to consumer
@@ -43,9 +42,9 @@ message NewFinalityProvider {
   string btc_pk_hex = 4;
   // pop is the proof of possession of babylon_pk and btc_pk
   ProofOfPossessionBTC pop = 5;
-  // consumer_id is the ID of the consumer the finality provider is operating on.
+  // bsn_id is the ID of the BSN the finality provider is operating on.
   // If it's missing / empty, it's assumed the finality provider is operating in Babylon.
-  string consumer_id = 8;
+  string bsn_id = 8;
 }
 
 // ActiveBTCDelegation is an IBC packet sent from Babylon to consumer
@@ -118,18 +117,6 @@ message BTCUndelegationInfo {
     DelegatorUnbondingInfo delegator_unbonding_info = 6;
 }
 
-// SlashedBTCDelegation is an IBC packet sent from Babylon to consumer
-// about a slashed BTC delegation restaked to >=1 of this consumer's 
-// finality provider
-message SlashedBTCDelegation {
-  // staking tx hash of the BTC delegation. It uniquely identifies a BTC delegation
-  string staking_tx_hash = 1;
-  // recovered_fp_btc_sk is the extracted BTC SK of the finality provider on
-  // this consumer
-  // this allows the consumer to verify the BTC delegation is indeed slashed
-  string recovered_fp_btc_sk = 2;
-}
-
 // UnbondedBTCDelegation is an IBC packet sent from Babylon to consumer
 // upon an early unbonded BTC delegation
 message UnbondedBTCDelegation {
@@ -154,9 +141,7 @@ message BTCStakingConsumerEvent {
     NewFinalityProvider new_fp = 1;
     // ActiveBTCDelegation represents the event of an active BTC delegation.
     ActiveBTCDelegation active_del = 2;
-    // SlashedBTCDelegation represents the event of a slashed BTC delegation.
-    SlashedBTCDelegation slashed_del = 3;
     // UnbondedBTCDelegation represents the event of an unbonded BTC delegation.
-    UnbondedBTCDelegation unbonded_del = 4;
+    UnbondedBTCDelegation unbonded_del = 3;
   }
 }

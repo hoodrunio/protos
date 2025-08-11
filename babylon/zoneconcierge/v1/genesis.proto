@@ -3,11 +3,44 @@ package babylon.zoneconcierge.v1;
 
 import "gogoproto/gogo.proto";
 import "babylon/zoneconcierge/v1/params.proto";
+import "babylon/zoneconcierge/v1/zoneconcierge.proto";
 
-option go_package = "github.com/babylonlabs-io/babylon/x/zoneconcierge/types";
+option go_package = "github.com/babylonlabs-io/babylon/v3/x/zoneconcierge/types";
 
 // GenesisState defines the zoneconcierge module's genesis state.
 message GenesisState {
-  string port_id = 1;
-  Params params = 2 [ (gogoproto.nullable) = false ];
+  // params holds the zoneconcierge module's parameters
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  // finalized_headers contains the latest IndexedHeaderWithProof for each consumer and each finalized epoch
+  repeated FinalizedHeaderEntry finalized_headers = 2;
+  // sealed_epochs_proofs contains the proofs that each epoch is sealed
+  repeated SealedEpochProofEntry sealed_epochs_proofs = 3;
+  // bsn_btc_states contains the BTC header synchronization state for each BSN
+  repeated BSNBTCStateEntry bsn_btc_states = 4;
+}
+
+// FinalizedHeaderEntry is a helper for genesis state.
+message FinalizedHeaderEntry {
+  // epoch_number is the epoch number
+  uint64 epoch_number = 1;
+  // consumer_id is the ID of the consumer
+  string consumer_id = 2;
+  // header_with_proof is the latest IndexedHeaderWithProof for the consumer and epoch
+  IndexedHeaderWithProof header_with_proof = 3;
+}
+
+// BSNBTCStateEntry is a helper for genesis state
+message BSNBTCStateEntry {
+  // consumer_id is the ID of the BSN
+  string consumer_id = 1;
+  // state is the BTC header synchronization state for the BSN
+  BSNBTCState state = 2;
+}
+
+// SealedEpochProofEntry contains each epoch's proof that it is sealed
+message SealedEpochProofEntry {
+  // epoch_number is the number of the epoch
+  uint64 epoch_number = 1;
+  // proof is the proof that an epoch is sealed by the sealer header
+  ProofEpochSealed proof = 2;
 }
