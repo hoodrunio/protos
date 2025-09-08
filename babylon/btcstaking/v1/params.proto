@@ -4,7 +4,7 @@ package babylon.btcstaking.v1;
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/babylonlabs-io/babylon/x/btcstaking/types";
+option go_package = "github.com/babylonlabs-io/babylon/v4/x/btcstaking/types";
 
 // Params defines the parameters for the module.
 message Params {
@@ -14,7 +14,7 @@ message Params {
   // each PK follows encoding in BIP-340 spec on Bitcoin
   repeated bytes covenant_pks = 1
       [ (gogoproto.customtype) =
-            "github.com/babylonlabs-io/babylon/types.BIP340PubKey" ];
+            "github.com/babylonlabs-io/babylon/v4/types.BIP340PubKey" ];
   // covenant_quorum is the minimum number of signatures needed for the covenant
   // multisignature
   uint32 covenant_quorum = 2;
@@ -61,13 +61,16 @@ message Params {
   ];
   // base gas fee for delegation creation
   uint64 delegation_creation_base_gas_fee = 13;
-  // allow_list_expiration_height is the height at which the allow list expires
+  // DEPRECATED: allow_list_expiration_height is the height at which the allow list expires
   // i.e all staking transactions are allowed to enter Babylon chain afterwards
-  // setting it to 0 means allow list is disabled
-  uint64 allow_list_expiration_height = 14;
+  // setting it to 0 means allow list is disabled (LEGACY)
+  uint64 allow_list_expiration_height = 14 [deprecated = true];
   // btc_activation_height is the btc height from which parameters are activated
   // (inclusive)
   uint32 btc_activation_height = 15;
+  // max_finality_providers is the maximum number of finality providers that can
+  // be used in staking script
+  uint32 max_finality_providers = 16;
 }
 
 // HeightVersionPair pairs a btc height with a version of the parameters
