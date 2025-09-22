@@ -53,4 +53,3 @@ message EventBTCDelegationUnbonded {
     (gogoproto.nullable) = false
   ];
 }
-
