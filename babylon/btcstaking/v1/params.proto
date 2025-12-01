@@ -61,16 +61,13 @@ message Params {
   ];
   // base gas fee for delegation creation
   uint64 delegation_creation_base_gas_fee = 13;
-  // DEPRECATED: allow_list_expiration_height is the height at which the allow list expires
+  // allow_list_expiration_height is the height at which the allow list expires
   // i.e all staking transactions are allowed to enter Babylon chain afterwards
-  // setting it to 0 means allow list is disabled (LEGACY)
-  uint64 allow_list_expiration_height = 14 [deprecated = true];
+  // setting it to 0 means allow list is disabled
+  uint64 allow_list_expiration_height = 14;
   // btc_activation_height is the btc height from which parameters are activated
   // (inclusive)
   uint32 btc_activation_height = 15;
-  // max_finality_providers is the maximum number of finality providers that can
-  // be used in staking script
-  uint32 max_finality_providers = 16;
 }
 
 // HeightVersionPair pairs a btc height with a version of the parameters
