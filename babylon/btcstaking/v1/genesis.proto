@@ -5,7 +5,6 @@ import "gogoproto/gogo.proto";
 import "babylon/btcstaking/v1/params.proto";
 import "babylon/btcstaking/v1/btcstaking.proto";
 import "babylon/btcstaking/v1/events.proto";
-import "babylon/btcstaking/v1/packet.proto";
 
 option go_package = "github.com/babylonlabs-io/babylon/v4/x/btcstaking/types";
 
@@ -24,12 +23,12 @@ message GenesisState {
   repeated BTCDelegator btc_delegators = 6;
   // all the events and its indexes.
   repeated EventIndex events = 7;
-  // Reserved for previous collection of the allowed staking transaction hashes (hex encoded)
-  reserved 8;
+  // collection of the allowed staking transaction hashes (hex encoded)
+  repeated string allowed_staking_tx_hashes = 8;
   // largest BTC block reorg
   LargestBtcReOrg largest_btc_reorg = 9;
-  // all consumer chain events
-  repeated ConsumerEvent consumer_events = 10;
+  // Reserved for consumer chain events
+  reserved 10;
   // Reserved for previous collection of the allowed multi-staking transaction hashes (hex encoded)
   reserved 11;
   // FpBbnAddr defines a list of the finality provider indexed by their babylon address.
@@ -68,13 +67,4 @@ message EventIndex {
   uint32 block_height_btc = 2;
   // event the event stored.
   EventPowerDistUpdate event = 3;
-}
-
-// ConsumerEvent contains the events belonging to a specific consumer chain.
-message ConsumerEvent {
-  // consumer_id is the identifier of the consumer chain
-  string consumer_id = 1;
-  // events holds all the events (NewFinalityProvider, ActiveBTCDelegation, UnbondedBTCDelegation)
-  // for the consumer chain
-  BTCStakingIBCPacket events = 2;
 }
