@@ -17,6 +17,7 @@ service Msg {
     rpc CommitPubRandList(MsgCommitPubRandList) returns (MsgCommitPubRandListResponse);
     // AddFinalitySig adds a finality signature to a given block
     rpc AddFinalitySig(MsgAddFinalitySig) returns (MsgAddFinalitySigResponse);
+    // TODO: msg for evidence of equivocation. this is not specified yet
     // UpdateParams updates the finality module parameters.
     rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
     // UnjailFinalityProvider defines a method for unjailing a jailed
@@ -24,9 +25,6 @@ service Msg {
     rpc UnjailFinalityProvider(MsgUnjailFinalityProvider) returns (MsgUnjailFinalityProviderResponse);
     // ResumeFinalityProposal handles the proposal of resuming finality.
     rpc ResumeFinalityProposal(MsgResumeFinalityProposal) returns (MsgResumeFinalityProposalResponse);
-    // EquivocationEvidence handles the evidence of equivocation message sent from
-    // the finality gadget cw contract
-    rpc EquivocationEvidence(MsgEquivocationEvidence) returns (MsgEquivocationEvidenceResponse);
 }
 
 // MsgCommitPubRandList defines a message for committing a list of public randomness for EOTS
@@ -107,37 +105,6 @@ message MsgUnjailFinalityProvider {
 
 // MsgUnjailFinalityProviderResponse defines the Msg/UnjailFinalityProvider response type
 message MsgUnjailFinalityProviderResponse {}
-
-// MsgEquivocationEvidence is the message for handling evidence of equivocation
-message MsgEquivocationEvidence {
-    option (cosmos.msg.v1.signer) = "signer";
-
-    string signer = 1;
-    // fp_btc_pk_hex is the BTC PK of the finality provider that casts this vote
-    string fp_btc_pk_hex = 2;
-    // block_height is the height of the conflicting blocks
-    uint64 block_height = 3;
-    // pub_rand_hex is the public randomness the finality provider has committed to
-    string pub_rand_hex = 4;
-    // canonical_app_hash_hex is the AppHash of the canonical block
-    string canonical_app_hash_hex = 5;
-    // fork_app_hash_hex is the AppHash of the fork block
-    string fork_app_hash_hex = 6;
-    // canonical_finality_sig_hex is the finality signature to the canonical block
-    // where finality signature is an EOTS signature, i.e.,
-    // the `s` in a Schnorr signature `(r, s)`
-    // `r` is the public randomness that is already committed by the finality provider
-    string canonical_finality_sig_hex = 7;
-    // fork_finality_sig_hex is the finality signature to the fork block
-    // where finality signature is an EOTS signature
-    string fork_finality_sig_hex = 8;
-    // signing_context is the context in which the finality signatures were used.
-    // It must be hex encoded 32 bytes, of the sha256 hash of the context string
-    string signing_context = 9;
-}
-
-// MsgEquivocationEvidenceResponse is the response for MsgEquivocationEvidence
-message MsgEquivocationEvidenceResponse {}
 
 // MsgResumeFinalityProposal is a governance proposal to resume finality from halting
 message MsgResumeFinalityProposal {
