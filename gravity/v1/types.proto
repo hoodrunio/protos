@@ -52,6 +52,10 @@ message ERC20ToDenom {
 // set disagrees with the rest. Normally this would require a chain halt, manual
 // genesis editing and restar to resolve with this feature a governance proposal
 // can be used instead
+// 
+// Note that this is very different from the BridgeActive flag in the params,
+// which controls whether or not the bridge is currently accepting new events.
+// This proposal is for rolling back state that is blocking the bridge.
 message UnhaltBridgeProposal {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
@@ -80,23 +84,43 @@ message AirdropProposal {
   repeated uint64 amounts = 5;
 }
 
-// IBCMetadataProposal defines a custom governance proposal type that allows
-// governance to set the metadata for an IBC token, this will allow Gravity to
-// deploy an ERC20 representing this token on Ethereum Name: the token name
-// Symbol: the token symbol
-// Description: the token description, not sent to ETH at all, only used on
-// Cosmos Display: the token display name (only used on Cosmos to decide ERC20
-// Decimals) Deicmals: the decimals for the display unit ibc_denom is the denom
-// of the token in question on this chain
-message IBCMetadataProposal {
+// SetCosmosBridgeableTokensProposal defines a custom governance proposal type
+// that allows governance to add or update entries in the
+// CosmosBridgeableTokens allowlist. This allows governance to control which
+// Cosmos tokens are allowed to cross the bridge to Ethereum.
+// Tokens not on the list will be blocked from SendToEth and acceptance in ERC20 deploy claims.
+//
+// The bank module's denom metadata for each listed denom is unconditionally
+// overwritten with the proposal's metadata, and the same value is written
+// into the CosmosBridgeableTokens store.
+message SetCosmosBridgeableTokensProposal {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
   option (gogoproto.goproto_stringer) = false;
 
   string title = 1;
   string description = 2;
-  cosmos.bank.v1beta1.Metadata metadata = 3 [ (gogoproto.nullable) = false ];
-  string ibc_denom = 4;
+  repeated cosmos.bank.v1beta1.Metadata metadatas = 3
+      [ (gogoproto.nullable) = false ];
+}
+
+// DeleteCosmosBridgeableTokensProposal defines a custom governance proposal
+// type that allows governance to remove entries from the
+// CosmosBridgeableTokens allowlist. This allows governance to control which
+// Cosmos tokens are allowed to cross the bridge to Ethereum.
+// Tokens not on the list will be blocked from SendToEth and acceptance in ERC20 deploy claims.
+//
+// Matching entries are removed from the CosmosBridgeableTokens store only
+// (bank metadata is left untouched).
+message DeleteCosmosBridgeableTokensProposal {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string title = 1;
+  string description = 2;
+  repeated cosmos.bank.v1beta1.Metadata metadatas = 3
+      [ (gogoproto.nullable) = false ];
 }
 
 // PendingIbcAutoForward represents a SendToCosmos transaction with a foreign
@@ -112,4 +136,18 @@ message PendingIbcAutoForward {
       3; // the IBC channel to send `Amount` over via ibc-transfer module
   uint64 event_nonce = 4; // the EventNonce from the MsgSendToCosmosClaim, used
                           // for ordering the queue
+}
+
+// IBCMetadataProposal is a removed governance proposal type kept only so that
+// historical x/gov proposals decode. It has no handler and its proposal type is
+// not registered, so new submissions are rejected.
+message IBCMetadataProposal {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string title = 1;
+  string description = 2;
+  cosmos.bank.v1beta1.Metadata metadata = 3 [ (gogoproto.nullable) = false ];
+  string ibc_denom = 4;
 }
