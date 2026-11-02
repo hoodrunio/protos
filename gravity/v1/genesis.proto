@@ -7,6 +7,7 @@ import "gravity/v1/msgs.proto";
 import "gravity/v1/batch.proto";
 import "gravity/v1/attestation.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/bank/v1beta1/bank.proto";
 
 option go_package = "github.com/Gravity-Bridge/Gravity-Bridge/module/x/gravity/types";
 
@@ -117,6 +118,14 @@ option go_package = "github.com/Gravity-Bridge/Gravity-Bridge/module/x/gravity/t
 // Specifies what fraction of the SendToEth `chain_fee` amount should go to the
 // auction pool. e.g. "0.5" gives a 50% auction pool / staker split while "0.9"
 // would cause 90% of the fee to go to the pool
+//
+// cosmos_bridgeable_tokens
+//
+// A whitelist of Cosmos-originated token denoms that are permitted to be
+// sent from Cosmos to Ethereum. This list does not affect Ethereum-originated assets
+// (with the "gravity" prefix), which are permitted regardless.
+// Tokens not on this list will be blocked from SendToEth and acceptance in
+// ERC20 deploy claims.
 message Params {
   option (gogoproto.stringer) = false;
 
@@ -179,6 +188,13 @@ message GenesisState {
   repeated OutgoingTransferTx unbatched_transfers = 12
       [ (gogoproto.nullable) = false ];
   repeated PendingIbcAutoForward pending_ibc_auto_forwards = 13
+      [ (gogoproto.nullable) = false ];
+  // remapped_erc20s lists the addresses of ERC20 tokens that
+  // have been remapped to use a new "gravity2" prefix. Old vouchers will not be
+  // exchangeable for their original ethereum assets, and only the new gravity2
+  // vouchers will be redeemable for ethereum tokens.
+  repeated string remapped_erc20s = 14;
+  repeated cosmos.bank.v1beta1.Metadata cosmos_bridgeable_tokens = 15
       [ (gogoproto.nullable) = false ];
 }
 
